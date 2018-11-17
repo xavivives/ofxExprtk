@@ -2,44 +2,31 @@
 # **************************************************************
 # *         C++ Mathematical Expression Toolkit Library        *
 # *                                                            *
-# * Author: Arash Partow (1999-2014)                           *
+# * Author: Arash Partow (1999-2018)                           *
 # * URL: http://www.partow.net/programming/exprtk/index.html   *
 # *                                                            *
 # * Copyright notice:                                          *
 # * Free use of the Mathematical Expression Toolkit Library is *
 # * permitted under the guidelines and in accordance with the  *
-# * most current version of the Common Public License.         *
-# * http://www.opensource.org/licenses/cpl1.0.php              *
+# * most current version of the MIT License.                   *
+# * http://www.opensource.org/licenses/MIT                     *
 # *                                                            *
 # **************************************************************
 #
 
 
-COMPILER         = -c++
-#COMPILER        = -clang
-OPTIMIZATION_OPT = -O1
-BASE_OPTIONS     = -pedantic-errors -Wall -Wextra -Werror -Wno-long-long
-OPTIONS          = $(BASE_OPTIONS) $(OPTIMIZATION_OPT)
-LINKER_OPT       = -L/usr/lib -lstdc++ -lm
-
-BUILD_LIST+=exprtk_test
-BUILD_LIST+=exprtk_benchmark
-BUILD_LIST+=exprtk_simple_example_01
-BUILD_LIST+=exprtk_simple_example_02
-BUILD_LIST+=exprtk_simple_example_03
-BUILD_LIST+=exprtk_simple_example_04
-BUILD_LIST+=exprtk_simple_example_05
-BUILD_LIST+=exprtk_simple_example_06
-BUILD_LIST+=exprtk_simple_example_07
-BUILD_LIST+=exprtk_simple_example_08
-BUILD_LIST+=exprtk_simple_example_09
-BUILD_LIST+=exprtk_simple_example_10
-BUILD_LIST+=exprtk_simple_example_11
-BUILD_LIST+=exprtk_simple_example_12
-BUILD_LIST+=exprtk_simple_example_13
-BUILD_LIST+=exprtk_simple_example_14
-BUILD_LIST+=exprtk_simple_example_15
-BUILD_LIST+=exprtk_simple_example_16
+COMPILER         := -c++
+#COMPILER        := -clang
+OPTIMIZATION_OPT := -O1
+BASE_OPTIONS     := -pedantic-errors -Wall -Wextra -Werror -Wno-long-long
+OPTIONS          := $(BASE_OPTIONS) $(OPTIMIZATION_OPT)
+LINKER_OPT       := -L/usr/lib -lstdc++ -lm
+ASAN_OPT         := -g -fsanitize=address   -fno-omit-frame-pointer
+MSAN_OPT         := -g -fsanitize=memory    -fno-omit-frame-pointer
+LSAN_OPT         := -g -fsanitize=leak      -fno-omit-frame-pointer
+USAN_OPT         := -g -fsanitize=undefined -fno-omit-frame-pointer
+BUILD_SRC        := $(sort $(wildcard exprtk_*.cpp))
+BUILD_LIST       := $(BUILD_SRC:%.cpp=%)
 
 
 all: $(BUILD_LIST)
