@@ -9,7 +9,7 @@ void ofApp::setup(){
     expr.add_var("x", x);
     expr.add_var("y", y);
     expr.compile();
-    ofLog() << expr.value();
+    cout << expr.value();
 }
 
 //--------------------------------------------------------------
