@@ -9,7 +9,7 @@ engine  supports numerous  forms  of  functional and  logic processing
 semantics and is easily extendible.
 
 ###Install
-Tested on Mac and OF 0.9.0
+Tested on Mac and OF 0.10.0
 
 On Xcode add the following flag under
 *Build settings > Apple LLVM 6.0 custom compiler flags > Other C++ Flags*
