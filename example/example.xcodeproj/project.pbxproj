@@ -42,7 +42,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2B0D462221A0235400A32DED /* ofxExprtk.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = ofxExprtk.hpp; path = ../src/ofxExprtk.hpp; sourceTree = "<group>"; };
+		2BD5FE6921A0A9000048B646 /* ofxExpr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ofxExpr.hpp; path = ../src/ofxExpr.hpp; sourceTree = "<group>"; };
+		2BD5FE6A21A0A9000048B646 /* ofxVecExpr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ofxVecExpr.hpp; path = ../src/ofxVecExpr.hpp; sourceTree = "<group>"; };
 		C47598FAD8FABE3C5E0AC74C /* exprtk.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = exprtk.hpp; path = ../../../addons/ofxExprtk/libs/exprtk/exprtk.hpp; sourceTree = SOURCE_ROOT; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E4B69B5B0A3A1756003C02F2 /* exampleDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = exampleDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -69,7 +70,8 @@
 		2B0D462021A0231D00A32DED /* src */ = {
 			isa = PBXGroup;
 			children = (
-				2B0D462221A0235400A32DED /* ofxExprtk.hpp */,
+				2BD5FE6921A0A9000048B646 /* ofxExpr.hpp */,
+				2BD5FE6A21A0A9000048B646 /* ofxVecExpr.hpp */,
 			);
 			name = src;
 			sourceTree = "<group>";

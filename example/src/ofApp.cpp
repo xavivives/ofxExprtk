@@ -1,15 +1,25 @@
 #include "ofApp.h"
-#include "ofxExprtk.hpp"
+#include "ofxExpr.hpp"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    double x = 123.0;
-    double y = 678.0;
+    float x = 123.0;
+    float y = 678.0;
+    
     ofxExpr expr("x * y + 3");
     expr.add_var("x", x);
     expr.add_var("y", y);
     expr.compile();
-    cout << expr.value();
+    cout << expr.value() << endl;
+    
+    x = 2;
+    y = 3;
+    cout << expr.value() << endl;
+    
+    ofxExpr expr2("sin(x)");
+    expr2.add_var("x", x);
+    expr2.compile();
+    cout << expr2.value() << endl;
 }
 
 //--------------------------------------------------------------
