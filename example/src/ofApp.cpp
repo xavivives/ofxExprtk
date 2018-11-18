@@ -1,12 +1,13 @@
 #include "ofApp.h"
 #include "ofxExpr.hpp"
+#include "ofxVecExpr.hpp"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
     float x = 123.0;
     float y = 678.0;
     
-    ofxExpr expr("x * y + 3");
+    ofxExpr<float> expr("x * y + 3");
     expr.add_var("x", x);
     expr.add_var("y", y);
     expr.compile();
@@ -16,10 +17,17 @@ void ofApp::setup(){
     y = 3;
     cout << expr.value() << endl;
     
-    ofxExpr expr2("sin(x)");
+    ofxExpr<float> expr2("sin(x)");
     expr2.add_var("x", x);
     expr2.compile();
     cout << expr2.value() << endl;
+    
+    float a = 1.f;
+    ofxVecExpr<glm::vec3> vecExpr;
+    vecExpr.set_expr("sin(a)");
+    vecExpr.add_var("a", a);
+    vecExpr.compile();
+    cout << vecExpr.value() << endl;
 }
 
 //--------------------------------------------------------------

@@ -1,43 +1,26 @@
 #pragma once
 
 #include "exprtk.hpp"
+#include "ofParameter.h"
 
 using namespace std;
 
 template<class Type>
-class ofxExpr_ {
+class ofxExpr : public ofParameter<Type> {
     
 public:
-    ofxExpr_() {}
-    ofxExpr_(const string &expression_string) : expression_string(expression_string) {}
-    ofxExpr_(const Type &value) {
-        set_explicit_value(value);
-    }
-    ofxExpr_(const ofxExpr_& other) {
-        expression_string = other.get();
-        if (other.get_explicit_value() != NULL) {
-            set_explicit_value(*other.get_explicit_value());
-        }
-    }
-    ofxExpr_& operator= (const ofxExpr_& other) {
-        if (this != &other) {
-            expression_string = other.get();
-            if (other.get_explicit_value() != NULL) {
-                set_explicit_value(*other.get_explicit_value());
-            }
-            else {
-                unset_explicit_value();
-            }
-        }
-        return *this;
-    }
-    const string & get() const {
-        return expression_string;
-    }
-    void set(const string &value) {
-        compiled = false;
-        expression_string = value;
-    }
+    ofxExpr();
+    ofxExpr(const string &expr);
+    ofxExpr(const Type &value);
+    ofxExpr(const string &name, const Type &value, const Type &min, const Type &max);
+    ofxExpr(const ofxExpr<Type>& other);
+    ofxExpr<Type>& operator= (const ofxExpr<Type>& other);
+    
+    ofxExpr<Type> & set(const Type &value);
+    ofxExpr<Type> & set(const string &name, const Type &value);
+    ofxExpr<Type> & set(const string &name, const Type &value, const Type &min, const Type &max);
+    void setName(const std::string & name);
+    
     bool add_var(const string &name, Type &value) {
         compiled = false;
         return symbol_table.add_variable(name, value);
@@ -58,38 +41,37 @@ public:
     bool compile() {
         if (!compiled) {
             expression.register_symbol_table(symbol_table);
-            compiled = parser.compile(expression_string, expression);
+            compiled = parser.compile(str_expr.get(), expression);
         }
         return compiled;
     }
     Type value() const {
-        if (explicit_value != NULL) {
-            return *explicit_value;
+        if (use_explicit_value) {
+            return this->get();
         }
         return expression.value();
     }
-    void set_explicit_value(const Type &value) {
-        if (explicit_value == NULL) {
-            explicit_value = shared_ptr<Type>(new Type);
-        }
-        *explicit_value = value;
+    const string & get_expr() const {
+        return str_expr.get();
     }
-    void unset_explicit_value() {
-        explicit_value = NULL;
+    void set_expr(const string &value) {
+        str_expr.set(value);
+        compiled = false;
+        use_explicit_value = false;
     }
-    const shared_ptr<Type> & get_explicit_value() const {
-        return explicit_value;
+    ofParameter<string> & get_str_expr() {
+        return str_expr;
+    }
+    bool is_explicit_value() const {
+        return use_explicit_value;
     }
     bool is_set() const {
-        return expression_string != "" || explicit_value != NULL;
+        return str_expr.get() != "" || (use_explicit_value && this->get());
     }
     
-    bool operator== (const ofxExpr_<Type> &e2) const {
-        return get_explicit_value() == e2.get_explicit_value() && get() == e2.get();
-    }
-    bool operator!= (const ofxExpr_<Type> &e2) const {
-        return !(*this == e2);
-    }
+    bool operator== (const ofxExpr<Type> &e2) const;
+    bool operator!= (const ofxExpr<Type> &e2) const;
+    shared_ptr<ofAbstractParameter> newReference() const;
     
 private:
     exprtk::symbol_table<Type> symbol_table;
@@ -97,9 +79,6 @@ private:
     exprtk::parser<Type>       parser;
     
     bool compiled = false;
-    string expression_string = "";
-    shared_ptr<Type> explicit_value = NULL;
+    bool use_explicit_value = false;
+    ofParameter<string> str_expr;
 };
-
-typedef ofxExpr_<float> ofxExpr;
-typedef ofxExpr_<double> ofxDoubleExpr;
