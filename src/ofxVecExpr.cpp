@@ -64,9 +64,10 @@ VecType ofxVecExpr<VecType>::getMax() const {
 
 template<typename VecType>
 ofxVecExpr<VecType> & ofxVecExpr<VecType>::set(const std::string &value) {
-    for (int i=0; i<expr.size(); i++) {
+    for (int i=0; i<size(); i++) {
         expr[i]->set(value);
     }
+    return *this;
 }
 
 template<typename VecType>

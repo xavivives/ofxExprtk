@@ -48,7 +48,7 @@ public:
     ofxExpr<Type> & set(const std::string &name, const Type &value, bool isExplicit = true);
     ofxExpr<Type> & set(const std::string &name, const Type &value, const Type &min, const Type &max, bool isExplicit = true);
     ofxExpr<Type> & set(const std::string & name, const std::string &expression, const Type &value, const Type &min, const Type &max, bool isExplicit = false);
-    ofxExpr<Type> & set(bool isExplicit);
+    ofxExpr<Type> & setExplicit(bool isExplicit);
     void setMin(const Type &min) {
         pValue->setMin(min);
     }

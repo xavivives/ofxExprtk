@@ -11,14 +11,11 @@ const std::string ofxExpr<Type>::NAME_EXPLICIT = "explicit";
 
 template<typename Type>
 ofxExpr<Type>::ofxExpr() : ofParameterGroup() {
-    pExpr = std::make_shared<ofParameter<std::string>>();
-    pExpr->setName(NAME_EXPR);
+    pExpr = std::make_shared<ofParameter<std::string>>(NAME_EXPR, "");
     add(*pExpr);
-    pValue = std::make_shared<ofParameter<Type>>();
-    pValue->setName(NAME_VALUE);
+    pValue = std::make_shared<ofParameter<Type>>(NAME_VALUE, 0.f);
     add(*pValue);
-    pExplicit = std::make_shared<ofParameter<bool>>();
-    pExplicit->setName(NAME_EXPLICIT);
+    pExplicit = std::make_shared<ofParameter<bool>>(NAME_EXPLICIT, false);
     add(*pExplicit);
 }
 
@@ -108,7 +105,7 @@ ofxExpr<Type> & ofxExpr<Type>::set(const std::string &name, const std::string &e
 }
 
 template<typename Type>
-ofxExpr<Type> & ofxExpr<Type>::set(bool isExplicit) {
+ofxExpr<Type> & ofxExpr<Type>::setExplicit(bool isExplicit) {
     pExplicit->set(isExplicit);
     return *this;
 }
