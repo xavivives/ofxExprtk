@@ -17,8 +17,8 @@ ofxVecExprInputField<VecType> * ofxVecExprInputField<VecType>::setup(ofxVecExpr<
     this->value.makeReferenceTo(value);
     
     for (size_t i = 0; i < value.dim(); i++) {
-        ofxExpr<float> p = *value[i];
-        add(new ofxExprInputField<float>(p, width, height));
+        ofxExpr p = *value[i];
+        add(new ofxExprInputField(p, width, height));
     }
     
     return this;

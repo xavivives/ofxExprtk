@@ -7,10 +7,10 @@ void ofApp::setup(){
     float x = 123.0;
     float y = 678.0;
     
-    ofxExpr<float> expr;
+    ofxExpr expr;
     expr.set("x * y + 3");
-    expr.add_var("x", x);
-    expr.add_var("y", y);
+    expr.addVar("x", x);
+    expr.addVar("y", y);
     expr.compile();
     cout << expr.get() << endl;
     
@@ -18,16 +18,16 @@ void ofApp::setup(){
     y = 3;
     cout << expr.get() << endl;
     
-    ofxExpr<float> expr2;
+    ofxExpr expr2;
     expr2.set("sin(x)");
-    expr2.add_var("x", x);
+    expr2.addVar("x", x);
     expr2.compile();
     cout << expr2.get() << endl;
     
     float a = 1.f;
     ofxVecExpr<glm::vec3> vecExpr;
     vecExpr.set("sin(a)");
-    vecExpr.add_var("a", a);
+    vecExpr.addVar("a", a);
     vecExpr.compile();
     cout << vecExpr.get() << endl;
 }

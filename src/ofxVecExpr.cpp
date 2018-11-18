@@ -4,7 +4,7 @@ template<typename VecType>
 ofxVecExpr<VecType>::ofxVecExpr() : ofParameterGroup() {
     const std::string names[4] = {"x", "y", "z", "w"};
     for (int i=0; i<ofxVecExpr<VecType>::dim(); i++) {
-        std::shared_ptr<ofxExpr<float>> e = std::make_shared<ofxExpr<float>>();
+        std::shared_ptr<ofxExpr> e = std::make_shared<ofxExpr>();
         e->setName(names[i]);
         add(*e);
         expr.push_back(e);

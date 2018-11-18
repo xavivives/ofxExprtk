@@ -1,12 +1,10 @@
 #include "ofxExprInputField.hpp"
 
-template<class Type>
-ofxExprInputField<Type>::ofxExprInputField(ofxExpr<Type> value, float width, float height){
+ofxExprInputField::ofxExprInputField(ofxExpr value, float width, float height){
     setup(value, width, height);
 }
 
-template<class Type>
-ofxExprInputField<Type> * ofxExprInputField<Type>::setup(ofxExpr<Type> &value, float width, float height){
+ofxExprInputField * ofxExprInputField::setup(ofxExpr &value, float width, float height){
     ofxGuiGroup::setup(value.getName(), "", 0, 0);
     
     clear();
@@ -15,7 +13,7 @@ ofxExprInputField<Type> * ofxExprInputField<Type>::setup(ofxExpr<Type> &value, f
     
     ofParameter<std::string> pExpr = *(value.getExpressionParameter());
     pExpr.setName(value.getName() + "E");
-    ofParameter<Type> pValue = *(value.getValueParameter());
+    ofParameter<float> pValue = *(value.getValueParameter());
     pValue.setName(value.getName() + "V");
     
     textField = new ofxTextField(pExpr, width, height);
@@ -24,7 +22,7 @@ ofxExprInputField<Type> * ofxExprInputField<Type>::setup(ofxExpr<Type> &value, f
     
     b.height -= textField->getHeight() + spacing;
     
-    slider = new ofxSlider<Type>(pValue, width, height);
+    slider = new ofxSlider<float>(pValue, width, height);
     add(slider);
     pValue.addListener(this, & ofxExprInputField::changeSlider);
     
@@ -32,37 +30,31 @@ ofxExprInputField<Type> * ofxExprInputField<Type>::setup(ofxExpr<Type> &value, f
     
 }
 
-template<class Type>
-ofxExprInputField<Type> * ofxExprInputField<Type>::setup(const std::string& controlName, const Type & v, const Type & min, const Type & max, float width, float height){
+ofxExprInputField * ofxExprInputField::setup(const std::string& controlName, const float & v, const float & min, const float & max, float width, float height){
     value.set(controlName,v,min,max);
     return setup(value,width,height);
 }
 
-template<class Type>
-void ofxExprInputField<Type>::changeSlider(const void * parameter, float & _value){
+void ofxExprInputField::changeSlider(const void * parameter, float & _value){
     value.set(_value);
 }
 
-template<class Type>
-void ofxExprInputField<Type>::changeInputField(const void * parameter, std::string & _value){
+void ofxExprInputField::changeInputField(const void * parameter, std::string & _value){
     value.set(_value);
 }
 
-template<class Type>
-void ofxExprInputField<Type>::changeToggle(const void * parameter, bool & _value){
+void ofxExprInputField::changeToggle(const void * parameter, bool & _value){
     value.set(_value);
 }
 
-template<class Type>
-void ofxExprInputField<Type>::clear(){
+void ofxExprInputField::clear(){
     collection.clear();
     parameters.clear();
     b.height = 0;
     sizeChangedCB();
 }
 
-template<class Type>
-bool ofxExprInputField<Type>::mouseMoved(ofMouseEventArgs & args){
+bool ofxExprInputField::mouseMoved(ofMouseEventArgs & args){
     if (value.isExplicit()) {
         return slider->mouseMoved(args);
     }
@@ -71,18 +63,25 @@ bool ofxExprInputField<Type>::mouseMoved(ofMouseEventArgs & args){
     }
 }
 
-template<class Type>
-bool ofxExprInputField<Type>::mousePressed(ofMouseEventArgs & args){
-    if (value.isExplicit()) {
-        return slider->mousePressed(args);
-    }
-    else {
-        return textField->mousePressed(args);
+bool ofxExprInputField::mousePressed(ofMouseEventArgs & mouse){
+    if(mouse.button == OF_MOUSE_BUTTON_RIGHT){
+        if(b.inside(mouse)){
+            value.setExplicit(!value.isExplicit());
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        if (value.isExplicit()) {
+            return slider->mousePressed(mouse);
+        }
+        else {
+            return textField->mousePressed(mouse);
+        }
     }
 }
 
-template<class Type>
-bool ofxExprInputField<Type>::mouseDragged(ofMouseEventArgs & args){
+bool ofxExprInputField::mouseDragged(ofMouseEventArgs & args){
     if (value.isExplicit()) {
         return slider->mouseDragged(args);
     }
@@ -91,8 +90,7 @@ bool ofxExprInputField<Type>::mouseDragged(ofMouseEventArgs & args){
     }
 }
 
-template<class Type>
-bool ofxExprInputField<Type>::mouseReleased(ofMouseEventArgs & args){
+bool ofxExprInputField::mouseReleased(ofMouseEventArgs & args){
     if (value.isExplicit()) {
         return slider->mouseReleased(args);
     }
@@ -101,8 +99,7 @@ bool ofxExprInputField<Type>::mouseReleased(ofMouseEventArgs & args){
     }
 }
 
-template<class Type>
-bool ofxExprInputField<Type>::mouseScrolled(ofMouseEventArgs & args){
+bool ofxExprInputField::mouseScrolled(ofMouseEventArgs & args){
     if (value.isExplicit()) {
         return slider->mouseScrolled(args);
     }
@@ -111,31 +108,40 @@ bool ofxExprInputField<Type>::mouseScrolled(ofMouseEventArgs & args){
     }
 }
 
+void ofxExprInputField::generateDraw(){
+    textMesh = getTextMesh("!", textPadding + b.x, 4 + b.y + spacingNextElement);
+}
 
-template<class Type>
-void ofxExprInputField<Type>::render(){
+void ofxExprInputField::render(){
     ofBlendMode blendMode = ofGetStyle().blendingMode;
     if(blendMode != OF_BLENDMODE_ALPHA){
         ofEnableAlphaBlending();
     }
-    ofColor c = ofGetStyle().color;
-    ofSetColor(thisTextColor);
 
     if (value.isExplicit()) {
         slider->draw();
     }
     else {
         textField->draw();
+        
+        if (value.hasError()) {
+            ofColor c = ofGetStyle().color;
+            ofSetColor(ofColor::red);
+
+            bindFontTexture();
+            textMesh.draw();
+            unbindFontTexture();
+            
+            ofSetColor(c);
+        }
     }
     
-    ofSetColor(c);
     if(blendMode != OF_BLENDMODE_ALPHA){
         ofEnableBlendMode(blendMode);
     }
 }
 
-template<class Type>
-void ofxExprInputField<Type>::sizeChangedCB(){
+void ofxExprInputField::sizeChangedCB(){
     for(std::size_t i = 0; i < collection.size(); i++){
         collection[i]->setPosition(collection[i]->getPosition().x, b.y);
     }
@@ -150,5 +156,3 @@ void ofxExprInputField<Type>::sizeChangedCB(){
     }
     setNeedsRedraw();
 }
-
-template class ofxExprInputField<float>;

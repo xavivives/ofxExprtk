@@ -1,18 +1,20 @@
 #pragma once
 
+#ifndef PrefixHeader_pch
 #include "ofxGuiGroup.h"
 #include "ofxInputField.h"
+#endif
+
 #include "ofxExpr.hpp"
 
-template<class Type>
 class ofxExprInputField : public ofxGuiGroup {
     
 public:
     ofxExprInputField() {}
-    ofxExprInputField(ofxExpr<Type> _val, float width = defaultWidth, float height = defaultHeight);
+    ofxExprInputField(ofxExpr _val, float width = defaultWidth, float height = defaultHeight);
     
-    ofxExprInputField<Type> * setup(ofxExpr<Type> &value, float width = defaultWidth, float height = defaultHeight);
-    ofxExprInputField<Type> * setup(const std::string& controlName, const Type & value, const Type & min, const Type & max, float width = defaultWidth, float height = defaultHeight);
+    ofxExprInputField * setup(ofxExpr &value, float width = defaultWidth, float height = defaultHeight);
+    ofxExprInputField * setup(const std::string& controlName, const float & value, const float & min, const float & max, float width = defaultWidth, float height = defaultHeight);
     
     void clear();
     void minimize() {}
@@ -22,6 +24,7 @@ public:
     virtual bool mouseDragged(ofMouseEventArgs & args);
     virtual bool mouseReleased(ofMouseEventArgs & args);
     virtual bool mouseScrolled(ofMouseEventArgs & args);
+    void generateDraw();
     void render();
     void sizeChangedCB();
     
@@ -30,8 +33,10 @@ protected:
     void changeInputField(const void * parameter, std::string & value);
     void changeToggle(const void * parameter, bool & value);
     
-    ofxExpr<Type> value;
+    ofxExpr value;
     ofxTextField * textField = NULL;
-    ofxSlider<Type> * slider = NULL;
+    ofxSlider<float> * slider = NULL;
+    
+    ofVboMesh textMesh;
     
 };

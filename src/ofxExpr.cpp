@@ -1,54 +1,44 @@
 #include "ofxExpr.hpp"
 
-template<typename Type>
-const std::string ofxExpr<Type>::NAME_EXPR = "expression";
+const std::string ofxExpr::NAME_EXPR = "expression";
 
-template<typename Type>
-const std::string ofxExpr<Type>::NAME_VALUE = "value";
+const std::string ofxExpr::NAME_VALUE = "value";
 
-template<typename Type>
-const std::string ofxExpr<Type>::NAME_EXPLICIT = "explicit";
+const std::string ofxExpr::NAME_EXPLICIT = "explicit";
 
-template<typename Type>
-ofxExpr<Type>::ofxExpr() : ofParameterGroup() {
+ofxExpr::ofxExpr() : ofParameterGroup() {
     pExpr = std::make_shared<ofParameter<std::string>>(NAME_EXPR, "");
     add(*pExpr);
-    pValue = std::make_shared<ofParameter<Type>>(NAME_VALUE, 0.f);
+    pValue = std::make_shared<ofParameter<float>>(NAME_VALUE, 0.f);
     add(*pValue);
     pExplicit = std::make_shared<ofParameter<bool>>(NAME_EXPLICIT, false);
     add(*pExplicit);
 }
 
-template<typename Type>
-ofxExpr<Type>::ofxExpr(const std::string &name, const std::string &expression, const Type &value, bool isExplicit) : ofxExpr() {
+ofxExpr::ofxExpr(const std::string &name, const std::string &expression, const float &value, bool isExplicit) : ofxExpr() {
     set(expression);
     set(name, value, isExplicit);
 }
 
-template<typename Type>
-ofxExpr<Type>::ofxExpr(const std::string &name, const std::string &expr) : ofxExpr() {
+ofxExpr::ofxExpr(const std::string &name, const std::string &expr) : ofxExpr() {
     setName(name);
     set(expr);
 }
 
-template<typename Type>
-ofxExpr<Type>::ofxExpr(const std::string &name, const Type &value, bool isExplicit) : ofxExpr() {
+ofxExpr::ofxExpr(const std::string &name, const float &value, bool isExplicit) : ofxExpr() {
     set(value, isExplicit);
 }
 
-template<typename Type>
-ofxExpr<Type>::ofxExpr(const std::string &name, const Type &value, const Type &min, const Type &max, bool isExplicit) : ofxExpr(name, "", value, min, max, isExplicit) {}
+ofxExpr::ofxExpr(const std::string &name, const float &value, const float &min, const float &max, bool isExplicit) : ofxExpr(name, "", value, min, max, isExplicit) {}
 
-template<typename Type>
-ofxExpr<Type>::ofxExpr(const ofxExpr<Type>& other) : ofParameterGroup() {
+ofxExpr::ofxExpr(const ofxExpr& other) : ofParameterGroup() {
     setName(other.getName());
     pExpr = other.getExpressionParameter();
     pValue = other.getValueParameter();
     pExplicit = other.getExplicitParameter();
 }
 
-template<typename Type>
-ofxExpr<Type>& ofxExpr<Type>::operator= (const ofxExpr<Type>& other) {
+ofxExpr& ofxExpr::operator= (const ofxExpr& other) {
     if (this != &other) {
         setName(other.getName());
         set(other.getExpression());
@@ -57,46 +47,40 @@ ofxExpr<Type>& ofxExpr<Type>::operator= (const ofxExpr<Type>& other) {
     return *this;
 }
 
-template<typename Type>
-ofxExpr<Type> & ofxExpr<Type>::set(const std::string &expression) {
+ofxExpr & ofxExpr::set(const std::string &expression) {
     pExpr->set(expression);
     pExplicit->set(false);
-    compiled = false;
+    compile();
     return *this;
 }
 
-template<typename Type>
-ofxExpr<Type> & ofxExpr<Type>::set(const Type &value, bool isExplicit) {
+ofxExpr & ofxExpr::set(const float &value, bool isExplicit) {
     pValue->set(value);
     pExplicit->set(isExplicit);
     return *this;
 }
 
-template<typename Type>
-ofxExpr<Type> & ofxExpr<Type>::set(const Type &value, const Type &min, const Type &max, bool isExplicit) {
+ofxExpr & ofxExpr::set(const float &value, const float &min, const float &max, bool isExplicit) {
     pValue->set(NAME_VALUE, value, min, max);
     pExplicit->set(isExplicit);
     return *this;
 }
 
-template<typename Type>
-ofxExpr<Type> & ofxExpr<Type>::set(const std::string &name, const Type &value, bool isExplicit) {
+ofxExpr & ofxExpr::set(const std::string &name, const float &value, bool isExplicit) {
     setName(name);
     pValue->set(value);
     pExplicit->set(isExplicit);
     return *this;
 }
 
-template<typename Type>
-ofxExpr<Type> & ofxExpr<Type>::set(const std::string &name, const Type &value, const Type &min, const Type &max, bool isExplicit) {
+ofxExpr & ofxExpr::set(const std::string &name, const float &value, const float &min, const float &max, bool isExplicit) {
     setName(name);
     pValue->set(NAME_VALUE, value, min, max);
     pExplicit->set(isExplicit);
     return *this;
 }
 
-template<typename Type>
-ofxExpr<Type> & ofxExpr<Type>::set(const std::string &name, const std::string &expression, const Type &value, const Type &min, const Type &max, bool isExplicit) {
+ofxExpr & ofxExpr::set(const std::string &name, const std::string &expression, const float &value, const float &min, const float &max, bool isExplicit) {
     setName(name);
     pExpr->set(expression);
     pValue->set(NAME_VALUE, value, min, max);
@@ -104,35 +88,27 @@ ofxExpr<Type> & ofxExpr<Type>::set(const std::string &name, const std::string &e
     return *this;
 }
 
-template<typename Type>
-ofxExpr<Type> & ofxExpr<Type>::setExplicit(bool isExplicit) {
+ofxExpr & ofxExpr::setExplicit(bool isExplicit) {
     pExplicit->set(isExplicit);
     return *this;
 }
 
-template<typename Type>
-bool ofxExpr<Type>::operator== (const ofxExpr<Type> &e2) const {
+bool ofxExpr::operator== (const ofxExpr &e2) const {
     std::string v1 = isExplicit() ? ofToString(getValue()) : pExpr->get();
     std::string v2 = e2.isExplicit() ? ofToString(e2.getValue()) : e2.getExpression();
     return v1 == v2;
 }
 
-template<typename Type>
-bool ofxExpr<Type>::operator!= (const ofxExpr<Type> &e2) const {
+bool ofxExpr::operator!= (const ofxExpr &e2) const {
     return !(*this == e2);
 }
 
-template<typename Type>
-std::shared_ptr<ofAbstractParameter> ofxExpr<Type>::newReference() const{
-    return std::make_shared<ofxExpr<Type>>(*this);
+std::shared_ptr<ofAbstractParameter> ofxExpr::newReference() const{
+    return std::make_shared<ofxExpr>(*this);
 }
 
-template<typename Type>
-void ofxExpr<Type>::makeReferenceTo(ofxExpr<Type> & mom) {
+void ofxExpr::makeReferenceTo(ofxExpr & mom) {
     pExpr = mom.getExpressionParameter();
     pValue = mom.getValueParameter();
     pExplicit = mom.getExplicitParameter();
 }
-
-template class ofxExpr<float>;
-template class ofxExpr<double>;

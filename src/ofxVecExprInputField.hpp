@@ -1,6 +1,9 @@
 #pragma once
 
+#ifndef PrefixHeader_pch
 #include "ofxGuiGroup.h"
+#endif
+
 #include "ofxVecExpr.hpp"
 
 template<class VecType>

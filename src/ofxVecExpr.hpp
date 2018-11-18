@@ -30,25 +30,25 @@ public:
     ofxVecExpr<VecType> & setSliderMinMax(const VecType & min, const VecType & max);
     void setRandom();
     
-    bool add_var(const std::string &name, float &value) {
+    bool addVar(const std::string &name, float &value, bool recompile = true) {
         for (int i=0; i<expr.size(); i++) {
-            expr[i]->add_var(name, value);
+            expr[i]->addVar(name, value, recompile);
         }
     }
-    bool add_const(const std::string &name, const float &value) {
+    bool addConst(const std::string &name, const float &value, bool recompile = true) {
         for (int i=0; i<expr.size(); i++) {
-            expr[i]->add_const(name, value);
+            expr[i]->addConst(name, value, recompile);
         }
     }
-    bool add_stringvar(const std::string &name, std::string &value) {
+    bool addStringvar(const std::string &name, std::string &value, bool recompile = true) {
         for (int i=0; i<expr.size(); i++) {
-            expr[i]->add_stringvar(name, value);
+            expr[i]->addStringvar(name, value, recompile);
         }
     }
     template<typename VecType1>
-    bool add_vector(const std::string &name, std::vector<VecType1> &value) {
+    bool addVector(const std::string &name, std::vector<VecType1> &value, bool recompile = true) {
         for (int i=0; i<expr.size(); i++) {
-            expr[i]->add_vector(name, value);
+            expr[i]->addVector(name, value, recompile);
         }
     }
     bool compile() {
@@ -65,7 +65,7 @@ public:
     }
     
     using ofParameterGroup::get;
-    const std::shared_ptr<ofxExpr<float>> & operator [] (const int i) const {
+    const std::shared_ptr<ofxExpr> & operator [] (const int i) const {
         return expr[i];
     }
     
@@ -88,6 +88,6 @@ public:
     static size_t dim();
     
 private:
-    std::vector<std::shared_ptr<ofxExpr<float>>> expr;
+    std::vector<std::shared_ptr<ofxExpr>> expr;
     
 };

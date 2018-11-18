@@ -1,9 +1,11 @@
 #pragma once
 
+#ifndef PrefixHeader_pch
 #include "exprtk.hpp"
+#endif
+
 #include "ofParameter.h"
 
-template<class Type>
 class ofxExpr : public ofParameterGroup {
     
 public:
@@ -12,50 +14,54 @@ public:
     static const std::string NAME_EXPLICIT;
     
     ofxExpr();
-    ofxExpr(const std::string &name, const std::string &expression, const Type &value, const Type &min, const Type &max, bool isExplicit = false);
-    ofxExpr(const std::string &name, const std::string &expression, const Type &value, bool isExplicit = false);
+    ofxExpr(const std::string &name, const std::string &expression, const float &value, const float &min, const float &max, bool isExplicit = false);
+    ofxExpr(const std::string &name, const std::string &expression, const float &value, bool isExplicit = false);
     ofxExpr(const std::string &name, const std::string &expr);
-    ofxExpr(const std::string &name, const Type &value, bool isExplicit = true);
-    ofxExpr(const std::string &name, const Type &value, const Type &min, const Type &max, bool isExplicit = true);
-    ofxExpr(const ofxExpr<Type>& other);
-    ofxExpr<Type>& operator= (const ofxExpr<Type>& other);
+    ofxExpr(const std::string &name, const float &value, bool isExplicit = true);
+    ofxExpr(const std::string &name, const float &value, const float &min, const float &max, bool isExplicit = true);
+    ofxExpr(const ofxExpr& other);
+    ofxExpr& operator= (const ofxExpr& other);
     
-    Type get() const {
+    float get() const {
         if (isExplicit()) {
             return getValue();
         }
-        return expression.value();
+        float val = expression.value();
+        return std::isnan(val) ? 0 : val;
     }
     const std::string & getExpression() const {
         return pExpr->get();
     }
-    const Type & getValue() const {
+    const float & getValue() const {
         return pValue->get();
     }
-    Type getMin() const {
+    float getMin() const {
         return pValue->getMin();
     }
-    Type getMax() const {
+    float getMax() const {
         return pValue->getMax();
     }
     const bool isExplicit() const {
         return pExplicit->get();
     }
+    const bool hasError() const {
+        return !compiled;
+    }
     
-    ofxExpr<Type> & set(const std::string &expression);
-    ofxExpr<Type> & set(const Type &value, bool isExplicit = true);
-    ofxExpr<Type> & set(const Type &value, const Type &min, const Type &max, bool isExplicit = true);
-    ofxExpr<Type> & set(const std::string &name, const Type &value, bool isExplicit = true);
-    ofxExpr<Type> & set(const std::string &name, const Type &value, const Type &min, const Type &max, bool isExplicit = true);
-    ofxExpr<Type> & set(const std::string & name, const std::string &expression, const Type &value, const Type &min, const Type &max, bool isExplicit = false);
-    ofxExpr<Type> & setExplicit(bool isExplicit);
-    void setMin(const Type &min) {
+    ofxExpr & set(const std::string &expression);
+    ofxExpr & set(const float &value, bool isExplicit = true);
+    ofxExpr & set(const float &value, const float &min, const float &max, bool isExplicit = true);
+    ofxExpr & set(const std::string &name, const float &value, bool isExplicit = true);
+    ofxExpr & set(const std::string &name, const float &value, const float &min, const float &max, bool isExplicit = true);
+    ofxExpr & set(const std::string & name, const std::string &expression, const float &value, const float &min, const float &max, bool isExplicit = false);
+    ofxExpr & setExplicit(bool isExplicit);
+    void setMin(const float &min) {
         pValue->setMin(min);
     }
-    void setMax(const Type &max) {
+    void setMax(const float &max) {
         pValue->setMax(max);
     }
-    ofxExpr<Type> & setSliderMinMax(const Type &min, const Type &max) {
+    ofxExpr & setSliderMinMax(const float &min, const float &max) {
         pValue->setSliderMinMax(min, max);
         return *this;
     }
@@ -63,22 +69,26 @@ public:
         set(ofRandom(getMin(), getMax()));
     }
     
-    bool add_var(const std::string &name, Type &value) {
-        compiled = false;
-        return symbol_table.add_variable(name, value);
+    bool addVar(const std::string &name, float &value, bool recompile = true) {
+        bool result = symbol_table.add_variable(name, value);
+        if (result && recompile) compile();
+        return result;
     }
-    bool add_const(const std::string &name, const Type &value) {
-        compiled = false;
-        return symbol_table.add_constant(name, value);
+    bool addConst(const std::string &name, const float &value, bool recompile = true) {
+        bool result = symbol_table.add_constant(name, value);
+        if (result && recompile) compile();
+        return result;
     }
-    bool add_stringvar(const std::string &name, std::string &value) {
-        compiled = false;
-        return symbol_table.add_stringvar(name, value);
+    bool addStringvar(const std::string &name, std::string &value, bool recompile = true) {
+        bool result = symbol_table.add_stringvar(name, value);
+        if (result && recompile) compile();
+        return result;
     }
     template<typename VecType>
-    bool add_vector(const std::string &name, std::vector<VecType> &value) {
-        compiled = false;
-        return symbol_table.add_vector(name, value);
+    bool addVector(const std::string &name, std::vector<VecType> &value, bool recompile = true) {
+        bool result = symbol_table.add_vector(name, value);
+        if (result && recompile) compile();
+        return result;
     }
     bool compile() {
         if (!compiled) {
@@ -90,7 +100,7 @@ public:
     const std::shared_ptr<ofParameter<std::string>> & getExpressionParameter() const {
         return pExpr;
     }
-    const std::shared_ptr<ofParameter<Type>> & getValueParameter() const {
+    const std::shared_ptr<ofParameter<float>> & getValueParameter() const {
         return pValue;
     }
     const std::shared_ptr<ofParameter<bool>> & getExplicitParameter() const {
@@ -106,18 +116,18 @@ public:
         return ofParameterGroup::get<ParameterType>(name);
     }
     
-    bool operator== (const ofxExpr<Type> &e2) const;
-    bool operator!= (const ofxExpr<Type> &e2) const;
+    bool operator== (const ofxExpr &e2) const;
+    bool operator!= (const ofxExpr &e2) const;
     std::shared_ptr<ofAbstractParameter> newReference() const;
-    void makeReferenceTo(ofxExpr<Type> & mom);
+    void makeReferenceTo(ofxExpr & mom);
     
 private:
-    exprtk::symbol_table<Type> symbol_table;
-    exprtk::expression<Type>   expression;
-    exprtk::parser<Type>       parser;
+    exprtk::symbol_table<float> symbol_table;
+    exprtk::expression<float>   expression;
+    exprtk::parser<float>       parser;
     
     bool compiled = false;
     std::shared_ptr<ofParameter<std::string>> pExpr;
-    std::shared_ptr<ofParameter<Type>> pValue;
+    std::shared_ptr<ofParameter<float>> pValue;
     std::shared_ptr<ofParameter<bool>> pExplicit;
 };
