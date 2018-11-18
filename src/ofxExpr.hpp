@@ -3,75 +3,113 @@
 #include "exprtk.hpp"
 #include "ofParameter.h"
 
-using namespace std;
-
 template<class Type>
-class ofxExpr : public ofParameter<Type> {
+class ofxExpr : public ofParameterGroup {
     
 public:
+    static const std::string NAME_EXPR;
+    static const std::string NAME_VALUE;
+    static const std::string NAME_EXPLICIT;
+    
     ofxExpr();
-    ofxExpr(const string &expr);
-    ofxExpr(const Type &value);
-    ofxExpr(const string &name, const Type &value, const Type &min, const Type &max);
+    ofxExpr(const std::string &name, const std::string &expression, const Type &value, const Type &min, const Type &max, bool isExplicit = false);
+    ofxExpr(const std::string &name, const std::string &expression, const Type &value, bool isExplicit = false);
+    ofxExpr(const std::string &name, const std::string &expr);
+    ofxExpr(const std::string &name, const Type &value, bool isExplicit = true);
+    ofxExpr(const std::string &name, const Type &value, const Type &min, const Type &max, bool isExplicit = true);
     ofxExpr(const ofxExpr<Type>& other);
     ofxExpr<Type>& operator= (const ofxExpr<Type>& other);
     
-    ofxExpr<Type> & set(const Type &value);
-    ofxExpr<Type> & set(const string &name, const Type &value);
-    ofxExpr<Type> & set(const string &name, const Type &value, const Type &min, const Type &max);
-    void setName(const std::string & name);
+    Type get() const {
+        if (isExplicit()) {
+            return getValue();
+        }
+        return expression.value();
+    }
+    const std::string & getExpression() const {
+        return pExpr->get();
+    }
+    const Type & getValue() const {
+        return pValue->get();
+    }
+    Type getMin() const {
+        return pValue->getMin();
+    }
+    Type getMax() const {
+        return pValue->getMax();
+    }
+    const bool isExplicit() const {
+        return pExplicit->get();
+    }
     
-    bool add_var(const string &name, Type &value) {
+    ofxExpr<Type> & set(const std::string &expression);
+    ofxExpr<Type> & set(const Type &value, bool isExplicit = true);
+    ofxExpr<Type> & set(const Type &value, const Type &min, const Type &max, bool isExplicit = true);
+    ofxExpr<Type> & set(const std::string &name, const Type &value, bool isExplicit = true);
+    ofxExpr<Type> & set(const std::string &name, const Type &value, const Type &min, const Type &max, bool isExplicit = true);
+    ofxExpr<Type> & set(const std::string & name, const std::string &expression, const Type &value, const Type &min, const Type &max, bool isExplicit = false);
+    ofxExpr<Type> & set(bool isExplicit);
+    void setMin(const Type &min) {
+        pValue->setMin(min);
+    }
+    void setMax(const Type &max) {
+        pValue->setMax(max);
+    }
+    ofxExpr<Type> & setSliderMinMax(const Type &min, const Type &max) {
+        pValue->setSliderMinMax(min, max);
+        return *this;
+    }
+    void setRandom() {
+        set(ofRandom(getMin(), getMax()));
+    }
+    
+    bool add_var(const std::string &name, Type &value) {
         compiled = false;
         return symbol_table.add_variable(name, value);
     }
-    bool add_const(const string &name, const Type &value) {
+    bool add_const(const std::string &name, const Type &value) {
         compiled = false;
         return symbol_table.add_constant(name, value);
     }
-    bool add_stringvar(const string &name, string &value) {
+    bool add_stringvar(const std::string &name, std::string &value) {
         compiled = false;
         return symbol_table.add_stringvar(name, value);
     }
     template<typename VecType>
-    bool add_vector(const string &name, vector<VecType> &value) {
+    bool add_vector(const std::string &name, std::vector<VecType> &value) {
         compiled = false;
         return symbol_table.add_vector(name, value);
     }
     bool compile() {
         if (!compiled) {
             expression.register_symbol_table(symbol_table);
-            compiled = parser.compile(str_expr.get(), expression);
+            compiled = parser.compile(pExpr->get(), expression);
         }
         return compiled;
     }
-    Type value() const {
-        if (use_explicit_value) {
-            return this->get();
-        }
-        return expression.value();
+    const std::shared_ptr<ofParameter<std::string>> & getExpressionParameter() const {
+        return pExpr;
     }
-    const string & get_expr() const {
-        return str_expr.get();
+    const std::shared_ptr<ofParameter<Type>> & getValueParameter() const {
+        return pValue;
     }
-    void set_expr(const string &value) {
-        str_expr.set(value);
-        compiled = false;
-        use_explicit_value = false;
+    const std::shared_ptr<ofParameter<bool>> & getExplicitParameter() const {
+        return pExplicit;
     }
-    ofParameter<string> & get_str_expr() {
-        return str_expr;
+
+    template<typename ParameterType>
+    const ofParameter<ParameterType> & get(const std::string& name) const {
+        return ofParameterGroup::get<ParameterType>(name);
     }
-    bool is_explicit_value() const {
-        return use_explicit_value;
-    }
-    bool is_set() const {
-        return str_expr.get() != "" || (use_explicit_value && this->get());
+    template<typename ParameterType>
+    ofParameter<ParameterType> & get(const std::string& name) {
+        return ofParameterGroup::get<ParameterType>(name);
     }
     
     bool operator== (const ofxExpr<Type> &e2) const;
     bool operator!= (const ofxExpr<Type> &e2) const;
-    shared_ptr<ofAbstractParameter> newReference() const;
+    std::shared_ptr<ofAbstractParameter> newReference() const;
+    void makeReferenceTo(ofxExpr<Type> & mom);
     
 private:
     exprtk::symbol_table<Type> symbol_table;
@@ -79,6 +117,7 @@ private:
     exprtk::parser<Type>       parser;
     
     bool compiled = false;
-    bool use_explicit_value = false;
-    ofParameter<string> str_expr;
+    std::shared_ptr<ofParameter<std::string>> pExpr;
+    std::shared_ptr<ofParameter<Type>> pValue;
+    std::shared_ptr<ofParameter<bool>> pExplicit;
 };
