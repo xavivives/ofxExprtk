@@ -1,10 +1,7 @@
 #pragma once
 
-#ifndef PrefixHeader_pch
 #include "ofxGuiGroup.h"
 #include "ofxInputField.h"
-#endif
-
 #include "ofxExpr.hpp"
 
 class ofxExprInputField : public ofxGuiGroup {
@@ -31,7 +28,6 @@ public:
 protected:
     void changeSlider(const void * parameter, float & value);
     void changeInputField(const void * parameter, std::string & value);
-    void changeToggle(const void * parameter, bool & value);
     
     ofxExpr value;
     ofxTextField * textField = NULL;

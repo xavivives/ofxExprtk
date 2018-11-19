@@ -1,9 +1,6 @@
 #pragma once
 
-#ifndef PrefixHeader_pch
 #include "exprtk.hpp"
-#endif
-
 #include "ofParameter.h"
 
 class ofxExpr : public ofParameterGroup {
@@ -48,7 +45,7 @@ public:
         return !compiled;
     }
     
-    ofxExpr & set(const std::string &expression);
+    ofxExpr & set(const std::string &expression, bool recompile = true);
     ofxExpr & set(const float &value, bool isExplicit = true);
     ofxExpr & set(const float &value, const float &min, const float &max, bool isExplicit = true);
     ofxExpr & set(const std::string &name, const float &value, bool isExplicit = true);
@@ -71,23 +68,35 @@ public:
     
     bool addVar(const std::string &name, float &value, bool recompile = true) {
         bool result = symbol_table.add_variable(name, value);
-        if (result && recompile) compile();
+        if (result) {
+            compiled = false;
+            if (recompile) compile();
+        }
         return result;
     }
     bool addConst(const std::string &name, const float &value, bool recompile = true) {
         bool result = symbol_table.add_constant(name, value);
-        if (result && recompile) compile();
+        if (result) {
+            compiled = false;
+            if (recompile) compile();
+        }
         return result;
     }
     bool addStringvar(const std::string &name, std::string &value, bool recompile = true) {
         bool result = symbol_table.add_stringvar(name, value);
-        if (result && recompile) compile();
+        if (result) {
+            compiled = false;
+            if (recompile) compile();
+        }
         return result;
     }
     template<typename VecType>
     bool addVector(const std::string &name, std::vector<VecType> &value, bool recompile = true) {
         bool result = symbol_table.add_vector(name, value);
-        if (result && recompile) compile();
+        if (result) {
+            compiled = false;
+            if (recompile) compile();
+        }
         return result;
     }
     bool compile() {

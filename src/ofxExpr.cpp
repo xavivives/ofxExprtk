@@ -47,10 +47,13 @@ ofxExpr& ofxExpr::operator= (const ofxExpr& other) {
     return *this;
 }
 
-ofxExpr & ofxExpr::set(const std::string &expression) {
+ofxExpr & ofxExpr::set(const std::string &expression, bool recompile) {
     pExpr->set(expression);
     pExplicit->set(false);
-    compile();
+    compiled = false;
+    if (recompile) {
+        compile();
+    }
     return *this;
 }
 

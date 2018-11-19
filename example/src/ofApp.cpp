@@ -8,14 +8,16 @@ void ofApp::setup(){
     float y = 678.0;
     
     ofxExpr expr;
-    expr.set("x * y + 3");
-    expr.addVar("x", x);
+    expr.set("x * y + 3", false);
+    expr.addVar("x", x, false);
     expr.addVar("y", y);
-    expr.compile();
     cout << expr.get() << endl;
     
     x = 2;
     y = 3;
+    cout << expr.get() << endl;
+    
+    expr.set("x + y");
     cout << expr.get() << endl;
     
     ofxExpr expr2;

@@ -13,15 +13,14 @@ ofxExprInputField * ofxExprInputField::setup(ofxExpr &value, float width, float 
     
     ofParameter<std::string> pExpr = *(value.getExpressionParameter());
     pExpr.setName(value.getName() + "E");
-    ofParameter<float> pValue = *(value.getValueParameter());
-    pValue.setName(value.getName() + "V");
-    
     textField = new ofxTextField(pExpr, width, height);
     add(textField);
     pExpr.addListener(this, & ofxExprInputField::changeInputField);
     
     b.height -= textField->getHeight() + spacing;
-    
+
+    ofParameter<float> pValue = *(value.getValueParameter());
+    pValue.setName(value.getName() + "V");
     slider = new ofxSlider<float>(pValue, width, height);
     add(slider);
     pValue.addListener(this, & ofxExprInputField::changeSlider);
@@ -40,11 +39,7 @@ void ofxExprInputField::changeSlider(const void * parameter, float & _value){
 }
 
 void ofxExprInputField::changeInputField(const void * parameter, std::string & _value){
-    value.set(_value);
-}
-
-void ofxExprInputField::changeToggle(const void * parameter, bool & _value){
-    value.set(_value);
+    value.set(_value, false);
 }
 
 void ofxExprInputField::clear(){
@@ -64,6 +59,9 @@ bool ofxExprInputField::mouseMoved(ofMouseEventArgs & args){
 }
 
 bool ofxExprInputField::mousePressed(ofMouseEventArgs & mouse){
+    if (!isGuiDrawing()) {
+        return false;
+    }
     if(mouse.button == OF_MOUSE_BUTTON_RIGHT){
         if(b.inside(mouse)){
             value.setExplicit(!value.isExplicit());
@@ -109,7 +107,7 @@ bool ofxExprInputField::mouseScrolled(ofMouseEventArgs & args){
 }
 
 void ofxExprInputField::generateDraw(){
-    textMesh = getTextMesh("!", textPadding + b.x, 4 + b.y + spacingNextElement);
+    textMesh = getTextMesh("!", textPadding + b.x, header / 2 + b.y + spacingNextElement);
 }
 
 void ofxExprInputField::render(){
